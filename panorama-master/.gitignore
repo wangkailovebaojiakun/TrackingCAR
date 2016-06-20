@@ -1,0 +1,10 @@
+obj
+main
+data/
+*.png
+*.zip
+.tags
+output
+*.pyc
+build/
+src/out.jpg

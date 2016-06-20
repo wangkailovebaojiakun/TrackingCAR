@@ -12,4 +12,8 @@ for frame in range( 1,len(imlist)):
     img = cv2.imread(imlist[frame])
     
     cv2.imshow('img',img)
-    cv2.waitKey(40)
+    c_input = cv2.waitKey(30)
+    if c_input == 27:
+	break
+
+        

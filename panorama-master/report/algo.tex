@@ -1,0 +1,45 @@
+% File: algo.tex
+% Date: Wed Jun 17 21:41:53 2015 +0800
+% Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
+\input{feature}
+\input{transform}
+\input{cylinder}
+\input{general}
+
+\section{Blending}
+The size of the final result is determined after having all the transformations.
+And the pixel value in the result image is calculated
+by an inverse transformation and bilinear interpolation with nearby pixels,
+in order to reduce alias effect.
+
+For overlapped regions, the distance from the
+overlapped pixel to each image center is used to calculate
+a weighted sum of the pixel value.
+I only used the distance along the $x$ axis to calculate the weight,
+to get better result in panoramic image.
+The result is almost seamless. Compare \figref{unbend-persp} and \figref{general-straighten}
+to see the effect of blending.
+
+\section{Cropping}
+When the option \verb|CROP = 1| is set,
+the program simply manage to find a rectangular with largest area within the original result.
+
+A $ O(n \times m)$ algorithm is used, where $ n, m$ is the height and width of the original result.
+The algorithm works like this:
+
+For each row $i$, the update
+\begin{flalign*}
+  h[j] &= \begin{cases}0,& if\ i = 0\ or\ A[i][j]\ is\ outside\ the\ area\\ h[j] + 1,& otherwise\end{cases}\\
+  r[j] &= \max\{ k \in [0, m) \cap \mathbf{N}: h[t] \ge h[j], \forall j \le t \le k\} \\
+  l[j]  &= \min\{ k \in [0, m) \cap \mathbf{N} : h[t] \ge h[j], \forall k \le t \le j\}\\
+\end{flalign*} for every $ j \in [0, n) $ can be done in amortized $ O(1)$ time, and the corresponding area is $ (r[j] - l[j] + 1) \times h[j]$.
+After the iteration, the rectangular $[i - h[j] + 1, i] \times [l[j], r[j]] $ with maximum area is our result.
+
+The cropped final result is shown in \figref{cropped}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{res/results/CMU1.jpg}
+  \caption{Cropped Result\label{fig:cropped}}
+\end{figure}
+
